@@ -78,7 +78,7 @@ func (sd *SelectDataset) Expression() exp.Expression {
 
 // Clones the dataset
 func (sd *SelectDataset) Clone() exp.Expression {
-	return sd.copy(sd.clauses)
+	return sd.copy(sd.clauses.Clone())
 }
 
 // Returns the current clauses on the dataset.

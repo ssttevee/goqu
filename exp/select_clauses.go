@@ -5,6 +5,7 @@ type (
 		HasSources() bool
 		IsDefaultSelect() bool
 		clone() *selectClauses
+		Clone() SelectClauses
 
 		Select() ColumnListExpression
 		SelectAppend(cl ColumnListExpression) SelectClauses
@@ -107,23 +108,73 @@ func (c *selectClauses) IsDefaultSelect() bool {
 }
 
 func (c *selectClauses) clone() *selectClauses {
-	return &selectClauses{
-		commonTables:  c.commonTables,
-		selectColumns: c.selectColumns,
-		distinct:      c.distinct,
-		from:          c.from,
-		joins:         c.joins[0:len(c.joins):len(c.joins)],
-		where:         c.where,
-		alias:         c.alias,
-		groupBy:       c.groupBy,
-		having:        c.having,
-		order:         c.order,
-		limit:         c.limit,
-		offset:        c.offset,
-		compounds:     c.compounds,
-		lock:          c.lock,
-		windows:       c.windows,
+	var clone selectClauses
+	if len(c.commonTables) > 0 {
+		clone.commonTables = make([]CommonTableExpression, len(c.commonTables))
+		copy(clone.commonTables, c.commonTables)
 	}
+
+	if c.selectColumns != nil {
+		clone.selectColumns = c.selectColumns.Clone().(ColumnListExpression)
+	}
+
+	if c.distinct != nil {
+		clone.distinct = c.distinct.Clone().(ColumnListExpression)
+	}
+
+	if c.distinct != nil {
+		clone.distinct = c.distinct.Clone().(ColumnListExpression)
+	}
+
+	if c.from != nil {
+		clone.from = c.from.Clone().(ColumnListExpression)
+	}
+
+	if len(c.joins) > 0 {
+		clone.joins = make(JoinExpressions, len(c.joins))
+		copy(clone.joins, c.joins)
+	}
+
+	if c.where != nil {
+		clone.where = c.where.Clone().(ExpressionList)
+	}
+
+	if c.alias != nil {
+		clone.alias = c.alias.Clone().(IdentifierExpression)
+	}
+
+	if c.groupBy != nil {
+		clone.groupBy = c.groupBy.Clone().(ColumnListExpression)
+	}
+
+	if c.having != nil {
+		clone.having = c.having.Clone().(ExpressionList)
+	}
+
+	if c.order != nil {
+		clone.order = c.order.Clone().(ColumnListExpression)
+	}
+
+	clone.limit = c.limit
+	clone.offset = c.offset
+
+	if len(c.compounds) > 0 {
+		clone.compounds = make([]CompoundExpression, len(c.compounds))
+		copy(clone.compounds, c.compounds)
+	}
+
+	if len(c.windows) > 0 {
+		clone.windows = make([]WindowExpression, len(c.windows))
+		copy(clone.windows, c.windows)
+	}
+
+	clone.lock = c.lock
+
+	return &clone
+}
+
+func (c *selectClauses) Clone() SelectClauses {
+	return c.clone()
 }
 
 func (c *selectClauses) CommonTables() []CommonTableExpression {
