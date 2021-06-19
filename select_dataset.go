@@ -348,6 +348,14 @@ func (sd *SelectDataset) joinTable(join exp.JoinExpression) *SelectDataset {
 	return sd.copy(sd.clauses.JoinsAppend(join))
 }
 
+// Adds a AS OF SYSTEM TIME clause. If the AS OF SYSTEM TIME is currently set it replaces it. See examples.
+func (sd *SelectDataset) AsOfSystemTime(asOfSystemTime interface{}) *SelectDataset {
+	if asOfSystemTime != nil {
+		return sd.copy(sd.clauses.SetAsOfSystemTime(asOfSystemTime))
+	}
+	return sd.copy(sd.clauses.ClearAsOfSystemTime())
+}
+
 // Adds a WHERE clause. See examples.
 func (sd *SelectDataset) Where(expressions ...exp.Expression) *SelectDataset {
 	return sd.copy(sd.clauses.WhereAppend(expressions...))

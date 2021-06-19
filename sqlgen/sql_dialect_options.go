@@ -111,6 +111,8 @@ type (
 		FetchFragment []byte
 		// The SQL LIMIT BY clause fragment(DEFAULT=[]byte(" LIMIT "))
 		LimitFragment []byte
+		// The SQL AS OF SYSTEM TIME clause fragment(DEFAULT=[]byte(" AS OF SYSTEM TIME "))
+		AsOfSystemTimeFragment []byte
 		// The SQL OFFSET BY clause fragment(DEFAULT=[]byte(" OFFSET "))
 		OffsetFragment []byte
 		// The SQL FOR UPDATE fragment(DEFAULT=[]byte(" FOR UPDATE "))
@@ -321,6 +323,7 @@ const (
 	SelectWithLimitSQLFragment
 	FromSQLFragment
 	JoinSQLFragment
+	AsOfSystemTimeSQLFragment
 	WhereSQLFragment
 	GroupBySQLFragment
 	HavingSQLFragment
@@ -354,6 +357,8 @@ func (sf SQLFragmentType) String() string {
 		return "FromSQLFragment"
 	case JoinSQLFragment:
 		return "JoinSQLFragment"
+	case AsOfSystemTimeSQLFragment:
+		return "AsOfSystemTimeSQLFragment"
 	case WhereSQLFragment:
 		return "WhereSQLFragment"
 	case GroupBySQLFragment:
@@ -445,6 +450,7 @@ func DefaultDialectOptions() *SQLDialectOptions {
 		OrderByFragment:           []byte(" ORDER BY "),
 		FetchFragment:             []byte(" "),
 		LimitFragment:             []byte(" LIMIT "),
+		AsOfSystemTimeFragment:    []byte(" AS OF SYSTEM TIME "),
 		OffsetFragment:            []byte(" OFFSET "),
 		ForUpdateFragment:         []byte(" FOR UPDATE "),
 		ForNoKeyUpdateFragment:    []byte(" FOR NO KEY UPDATE "),
@@ -542,6 +548,7 @@ func DefaultDialectOptions() *SQLDialectOptions {
 			SelectSQLFragment,
 			FromSQLFragment,
 			JoinSQLFragment,
+			AsOfSystemTimeSQLFragment,
 			WhereSQLFragment,
 			GroupBySQLFragment,
 			HavingSQLFragment,

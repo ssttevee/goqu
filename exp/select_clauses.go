@@ -24,6 +24,11 @@ type (
 		Joins() JoinExpressions
 		JoinsAppend(jc JoinExpression) SelectClauses
 
+		AsOfSystemTime() interface{}
+		HasAsOfSystemTime() bool
+		ClearAsOfSystemTime() SelectClauses
+		SetAsOfSystemTime(limit interface{}) SelectClauses
+
 		Where() ExpressionList
 		ClearWhere() SelectClauses
 		WhereAppend(expressions ...Expression) SelectClauses
@@ -66,21 +71,22 @@ type (
 		ClearWindows() SelectClauses
 	}
 	selectClauses struct {
-		commonTables  []CommonTableExpression
-		selectColumns ColumnListExpression
-		distinct      ColumnListExpression
-		from          ColumnListExpression
-		joins         JoinExpressions
-		where         ExpressionList
-		alias         IdentifierExpression
-		groupBy       ColumnListExpression
-		having        ExpressionList
-		order         ColumnListExpression
-		limit         interface{}
-		offset        uint
-		compounds     []CompoundExpression
-		lock          Lock
-		windows       []WindowExpression
+		commonTables   []CommonTableExpression
+		selectColumns  ColumnListExpression
+		distinct       ColumnListExpression
+		from           ColumnListExpression
+		joins          JoinExpressions
+		asOfSystemTime interface{}
+		where          ExpressionList
+		alias          IdentifierExpression
+		groupBy        ColumnListExpression
+		having         ExpressionList
+		order          ColumnListExpression
+		limit          interface{}
+		offset         uint
+		compounds      []CompoundExpression
+		lock           Lock
+		windows        []WindowExpression
 	}
 )
 
@@ -134,6 +140,8 @@ func (c *selectClauses) clone() *selectClauses {
 		clone.joins = make(JoinExpressions, len(c.joins))
 		copy(clone.joins, c.joins)
 	}
+
+	clone.asOfSystemTime = c.asOfSystemTime
 
 	if c.where != nil {
 		clone.where = c.where.Clone().(ExpressionList)
@@ -244,6 +252,26 @@ func (c *selectClauses) Joins() JoinExpressions {
 func (c *selectClauses) JoinsAppend(jc JoinExpression) SelectClauses {
 	ret := c.clone()
 	ret.joins = append(ret.joins, jc)
+	return ret
+}
+
+func (c *selectClauses) AsOfSystemTime() interface{} {
+	return c.asOfSystemTime
+}
+
+func (c *selectClauses) HasAsOfSystemTime() bool {
+	return c.asOfSystemTime != nil
+}
+
+func (c *selectClauses) ClearAsOfSystemTime() SelectClauses {
+	ret := c.clone()
+	ret.asOfSystemTime = nil
+	return ret
+}
+
+func (c *selectClauses) SetAsOfSystemTime(asOfSystemTime interface{}) SelectClauses {
+	ret := c.clone()
+	ret.asOfSystemTime = asOfSystemTime
 	return ret
 }
 

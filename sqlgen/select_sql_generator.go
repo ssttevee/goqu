@@ -59,6 +59,8 @@ func (ssg *selectSQLGenerator) Generate(b sb.SQLBuilder, clauses exp.SelectClaus
 			ssg.FromSQL(b, clauses.From())
 		case JoinSQLFragment:
 			ssg.JoinSQL(b, clauses.Joins())
+		case AsOfSystemTimeSQLFragment:
+			ssg.AsOfSystemTimeSQL(b, clauses.AsOfSystemTime())
 		case WhereSQLFragment:
 			ssg.WhereSQL(b, clauses.Where())
 		case GroupBySQLFragment:
@@ -145,6 +147,14 @@ func (ssg *selectSQLGenerator) JoinSQL(b sb.SQLBuilder, joins exp.JoinExpression
 				ssg.joinConditionSQL(b, t.Condition())
 			}
 		}
+	}
+}
+
+// Generates the AS OF SYSTEM TIME clauses for an SQL statement
+func (ssg *selectSQLGenerator) AsOfSystemTimeSQL(b sb.SQLBuilder, asOfSystemTime interface{}) {
+	if asOfSystemTime != nil {
+		b.Write(ssg.DialectOptions().AsOfSystemTimeFragment)
+		ssg.ExpressionSQLGenerator().Generate(b, asOfSystemTime)
 	}
 }
 
